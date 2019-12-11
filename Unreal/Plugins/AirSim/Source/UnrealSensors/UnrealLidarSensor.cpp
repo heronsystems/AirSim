@@ -99,6 +99,13 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
                 point_cloud.emplace_back(point.z());
                 segmentation_cloud.emplace_back(segmentationID);
             }
+            else
+            {
+                point_cloud.emplace_back(-1);
+                point_cloud.emplace_back(-1);
+                point_cloud.emplace_back(-1);
+                segmentation_cloud.emplace_back(segmentationID);
+            }
         }
     }
 
