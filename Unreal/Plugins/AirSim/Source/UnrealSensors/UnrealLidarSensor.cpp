@@ -101,6 +101,7 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
             }
             else
             {
+                std::cout << "Emplacing -1" << std::endl;
                 point_cloud.emplace_back(-1);
                 point_cloud.emplace_back(-1);
                 point_cloud.emplace_back(-1);
