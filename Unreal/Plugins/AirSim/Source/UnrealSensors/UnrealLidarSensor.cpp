@@ -46,6 +46,7 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 {
     point_cloud.clear();
     segmentation_cloud.clear();
+    std::cout << "in getPointCloud" << std::endl;
 
     msr::airlib::LidarSimpleParams params = getParams();
     const auto number_of_lasers = params.number_of_channels;

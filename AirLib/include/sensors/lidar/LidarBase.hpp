@@ -42,6 +42,7 @@ public:
 
     const LidarData& getOutput() const
     {
+        std::cout << "in getOutput of LidarBase.hpp" << std::endl;
         return output_;
     }
 

@@ -72,6 +72,7 @@ protected:
 private: //methods
     void updateOutput()
     {
+        std::cout << "In updateOoutput of LidarSimple.hpp" << std::endl;
         TTimeDelta delta_time = clock()->updateSince(last_time_);
 
         point_cloud_.clear();
