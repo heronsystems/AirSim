@@ -66,13 +66,13 @@ public:
 
 protected:
     virtual void getPointCloud(const Pose& lidar_pose, const Pose& vehicle_pose, 
-        TTimeDelta delta_time, vector<real_T>& point_cloud, vector<int>& segmentation_cloud) = 0;
+        TTimeDelta delta_time, vector<vector<real_T> >& point_cloud, vector<int>& segmentation_cloud) = 0;
 
     
 private: //methods
     void updateOutput()
     {
-        std::cout << "In updateOoutput of LidarSimple.hpp" << std::endl;
+        // std::cout << "In updateOoutput of LidarSimple.hpp" << std::endl;
         TTimeDelta delta_time = clock()->updateSince(last_time_);
 
         point_cloud_.clear();
@@ -108,7 +108,7 @@ private: //methods
 
 private:
     LidarSimpleParams params_;
-    vector<real_T> point_cloud_;
+    vector<vector<real_T> > point_cloud_;
     vector<int> segmentation_cloud_;
 
     FrequencyLimiter freq_limiter_;

@@ -629,56 +629,58 @@ void ASimModeBase::drawLidarDebugPoints()
     if (getApiProvider() == nullptr)
         return;
 
-    for (auto& sim_api : getApiProvider()->getVehicleSimApis()) {
-        PawnSimApi* pawn_sim_api = static_cast<PawnSimApi*>(sim_api);
-        std::string vehicle_name = pawn_sim_api->getVehicleName();
+    // TODO-@patnolan33: Modify the loop below to match the range/az/el modifications we made to the lidar data structure
 
-        msr::airlib::VehicleApiBase* api = getApiProvider()->getVehicleApi(vehicle_name);
-        if (api != nullptr) {
+    // for (auto& sim_api : getApiProvider()->getVehicleSimApis()) {
+    //     PawnSimApi* pawn_sim_api = static_cast<PawnSimApi*>(sim_api);
+    //     std::string vehicle_name = pawn_sim_api->getVehicleName();
+
+    //     msr::airlib::VehicleApiBase* api = getApiProvider()->getVehicleApi(vehicle_name);
+    //     if (api != nullptr) {
             
-            msr::airlib::uint count_lidars = api->getSensors().size(msr::airlib::SensorBase::SensorType::Lidar);
+    //         msr::airlib::uint count_lidars = api->getSensors().size(msr::airlib::SensorBase::SensorType::Lidar);
 
-            for (msr::airlib::uint i = 0; i < count_lidars; i++) {
-                // TODO: Is it incorrect to assume LidarSimple here?
-                const msr::airlib::LidarSimple* lidar =
-                    static_cast<const msr::airlib::LidarSimple*>(api->getSensors().getByType(msr::airlib::SensorBase::SensorType::Lidar, i));
-                if (lidar != nullptr && lidar->getParams().draw_debug_points) {
-                    lidar_draw_debug_points_ = true;
+    //         for (msr::airlib::uint i = 0; i < count_lidars; i++) {
+    //             // TODO: Is it incorrect to assume LidarSimple here?
+    //             const msr::airlib::LidarSimple* lidar =
+    //                 static_cast<const msr::airlib::LidarSimple*>(api->getSensors().getByType(msr::airlib::SensorBase::SensorType::Lidar, i));
+    //             if (lidar != nullptr && lidar->getParams().draw_debug_points) {
+    //                 lidar_draw_debug_points_ = true;
 
-                    msr::airlib::LidarData lidar_data = lidar->getOutput();
+    //                 msr::airlib::LidarData lidar_data = lidar->getOutput();
 
-                    if (lidar_data.point_cloud.size() < 3)
-                        return;
+    //                 if (lidar_data.point_cloud.size() < 3)
+    //                     return;
 
-                    for (int j = 0; j < lidar_data.point_cloud.size(); j = j + 3) {
-                        msr::airlib::Vector3r point(lidar_data.point_cloud[j], lidar_data.point_cloud[j + 1], lidar_data.point_cloud[j + 2]);
+    //                 for (int j = 0; j < lidar_data.point_cloud.size(); j = j + 3) {
+    //                     msr::airlib::Vector3r point(lidar_data.point_cloud[j], lidar_data.point_cloud[j + 1], lidar_data.point_cloud[j + 2]);
 
-                        FVector uu_point;
+    //                     FVector uu_point;
 
-                        if (lidar->getParams().data_frame == AirSimSettings::kVehicleInertialFrame) {
-                            uu_point = pawn_sim_api->getNedTransform().fromLocalNed(point);
-                        }
-                        else if (lidar->getParams().data_frame == AirSimSettings::kSensorLocalFrame) {
+    //                     if (lidar->getParams().data_frame == AirSimSettings::kVehicleInertialFrame) {
+    //                         uu_point = pawn_sim_api->getNedTransform().fromLocalNed(point);
+    //                     }
+    //                     else if (lidar->getParams().data_frame == AirSimSettings::kSensorLocalFrame) {
 
-                            msr::airlib::Vector3r point_w = msr::airlib::VectorMath::transformToWorldFrame(point, lidar_data.pose, true);
-                            uu_point = pawn_sim_api->getNedTransform().fromLocalNed(point_w);
-                        }
-                        else
-                            throw std::runtime_error("Unknown requested data frame");
+    //                         msr::airlib::Vector3r point_w = msr::airlib::VectorMath::transformToWorldFrame(point, lidar_data.pose, true);
+    //                         uu_point = pawn_sim_api->getNedTransform().fromLocalNed(point_w);
+    //                     }
+    //                     else
+    //                         throw std::runtime_error("Unknown requested data frame");
 
-                        DrawDebugPoint(
-                            this->GetWorld(),
-                            uu_point,
-                            5,              //size
-                            FColor::Green,
-                            true,           //persistent (never goes away)
-                            0.1             //point leaves a trail on moving object
-                        );
-                    }
-                }
-            }
-        }
-    }
+    //                     DrawDebugPoint(
+    //                         this->GetWorld(),
+    //                         uu_point,
+    //                         5,              //size
+    //                         FColor::Green,
+    //                         true,           //persistent (never goes away)
+    //                         0.1             //point leaves a trail on moving object
+    //                     );
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     lidar_checks_done_ = true;
 }

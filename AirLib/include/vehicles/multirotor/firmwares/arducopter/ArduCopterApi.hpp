@@ -328,7 +328,7 @@ private:
                    "\"lidar\": {"
                    "\"point_cloud\": [";
 
-            std::copy(lidar_output.point_cloud.begin(), lidar_output.point_cloud.end(), std::ostream_iterator<real_T>(oss, ","));
+            std::copy(lidar_output.point_cloud[0].begin(), lidar_output.point_cloud[0].end(), std::ostream_iterator<real_T>(oss, ","));
             oss << "]}";
         }
 

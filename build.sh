@@ -142,6 +142,9 @@ Unreal/Environments/Blocks/clean.sh
 mkdir -p Unreal/Environments/Blocks/Plugins
 rsync -a --delete Unreal/Plugins/AirSim Unreal/Environments/Blocks/Plugins
 
+# Update Neigh project
+rsync -a --delete Unreal/Plugins/AirSim Unreal/Environments/Neigh/Plugins
+
 set +x
 
 echo ""

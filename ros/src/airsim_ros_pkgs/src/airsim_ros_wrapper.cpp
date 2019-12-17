@@ -602,10 +602,10 @@ sensor_msgs::PointCloud2 AirsimROSWrapper::get_lidar_msg_from_airsim(const msr::
     sensor_msgs::PointCloud2 lidar_msg;
     lidar_msg.header.frame_id = world_frame_id_; // todo
 
-    if (lidar_data.point_cloud.size() > 3)
+    if (lidar_data.point_cloud[0].size() > 3)
     {
         lidar_msg.height = 1;
-        lidar_msg.width = lidar_data.point_cloud.size() / 3;
+        lidar_msg.width = lidar_data.point_cloud[0].size() / 3;
 
         lidar_msg.fields.resize(3);
         lidar_msg.fields[0].name = "x"; 
@@ -625,7 +625,7 @@ sensor_msgs::PointCloud2 AirsimROSWrapper::get_lidar_msg_from_airsim(const msr::
         lidar_msg.row_step = lidar_msg.point_step * lidar_msg.width;
 
         lidar_msg.is_dense = true; // todo
-        std::vector<float> data_std = lidar_data.point_cloud;
+        std::vector<float> data_std = lidar_data.point_cloud[0];
 
         const unsigned char* bytes = reinterpret_cast<const unsigned char*>(&data_std[0]);
         vector<unsigned char> lidar_msg_data(bytes, bytes + sizeof(float) * data_std.size());

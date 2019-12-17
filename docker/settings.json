@@ -1,19 +1,337 @@
 {
-  "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
-  "SettingsVersion": 1.2,
-  "SimMode": "Multirotor",
-  "ClockSpeed": 1.0,
-  "Vehicles": {
-    "SimpleFlight": {
-      "VehicleType": "SimpleFlight",
-      "DefaultVehicleState": "Armed",
-      "EnableCollisionPassthrogh": false,
-      "EnableCollisions": true,
-      "AllowAPIAlways": true,
-      "RC": {
-        "RemoteControlID": 0,
-        "AllowAPIWhenDisconnected": false
+    "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings_json.md",
+    "SettingsVersion": 1.2,
+    "SimMode": "Multirotor",
+    "ClockSpeed": 1.0,
+    "ViewMode": "",
+    "LocalHostIp": "127.0.0.1",
+    "Recording": {
+      "RecordOnMove": false,
+      "RecordInterval": 0.05,
+      "Cameras": [
+        {
+          "CameraName": "Drone1_Scene",
+          "ImageType": 0,
+          "PixelsAsFloat": false,
+          "Compress": true
+        }
+      ]
+    },
+    "CameraDefaults": {
+      "CaptureSettings": [
+        {
+          "ImageType": 0,
+          "Width": 256,
+          "Height": 144,
+          "FOV_Degrees": 90,
+          "AutoExposureSpeed": 100,
+          "AutoExposureBias": 0,
+          "AutoExposureMaxBrightness": 0.64,
+          "AutoExposureMinBrightness": 0.03,
+          "MotionBlurAmount": 0,
+          "TargetGamma": 1.0,
+          "ProjectionMode": "",
+          "OrthoWidth": 5.12
+        }
+      ],
+      "NoiseSettings": [
+        {
+          "Enabled": false,
+          "ImageType": 0,
+          "RandContrib": 0.2,
+          "RandSpeed": 100000.0,
+          "RandSize": 500.0,
+          "RandDensity": 2,
+          "HorzWaveContrib": 0.03,
+          "HorzWaveStrength": 0.08,
+          "HorzWaveVertSize": 1.0,
+          "HorzWaveScreenSize": 1.0,
+          "HorzNoiseLinesContrib": 1.0,
+          "HorzNoiseLinesDensityY": 0.01,
+          "HorzNoiseLinesDensityXY": 0.5,
+          "HorzDistortionContrib": 1.0,
+          "HorzDistortionStrength": 0.002
+        }
+      ],
+      "X": 0,
+      "Y": 0,
+      "Z": 0,
+      "Pitch": 60,
+      "Roll": 0,
+      "Yaw": 0
+    },
+    "SubWindows": [
+        {"WindowID": 0, "ImageType": 0, "CameraName": "ForwardLookingSideCamera_Left", "Visible": false},
+        {"WindowID": 1, "ImageType": 0, "CameraName": "MainForwardCamera", "Visible": false},
+        {"WindowID": 2, "ImageType": 0, "CameraName": "ForwardLookingSideCamera_Right", "Visible": false}
+    ],
+    "Vehicles": {
+      "Drone1": {
+        "VehicleType": "SimpleFlight",
+        "DefaultVehicleState": "Armed",
+        "EnableCollisionPassthrogh": false,
+        "EnableCollisions": true,
+        "AllowAPIAlways": true,
+        "X": 0,
+        "Y": 0,
+        "Z": -1,
+        "Yaw": 0,
+        "Cameras": {
+          "NarrowForwardCamera": {
+              "CaptureSettings": [
+                  {
+                      "Width": 1280,
+                      "Height": 960,
+                      "FOV_Degrees": 35,
+                      "ImageType": 0
+                  }
+              ],
+              "X": 0,
+              "Y": 0,
+              "Z": -1.75,
+              "Roll": 0,
+              "Pitch": 0,
+              "Yaw": 0
+          },
+          "MainForwardCamera": {
+              "CaptureSettings": [
+                  {
+                      "Width": 1280,
+                      "Height": 960,
+                      "FOV_Degrees": 50,
+                      "ImageType": 0
+                  }
+              ],
+              "X": 0,
+              "Y": 0,
+              "Z": -1.75,
+              "Roll": 0,
+              "Pitch": 0,
+              "Yaw": 0
+          },
+          "WideForwardCamera": {
+              "CaptureSettings": [
+                  {
+                      "Width": 1280,
+                      "Height": 960,
+                      "FOV_Degrees": 150,
+                      "ImageType": 0
+                  }
+              ],
+              "X": 1.85,
+              "Y": 0,
+              "Z": -1.75,
+              "Roll": 0,
+              "Pitch": 0,
+              "Yaw": 0
+          },
+          "ForwardLookingSideCamera_Right": {
+              "CaptureSettings": [
+                  {
+                      "Width": 1280,
+                      "Height": 960,
+                      "FOV_Degrees": 50,
+                      "ImageType": 0
+                  }
+              ],
+              "X": 0,
+              "Y": 0.85,
+              "Z": -0.75,
+              "Roll": 0,
+              "Pitch": 0,
+              "Yaw": 85
+          },
+          "ForwardLookingSideCamera_Left": {
+              "CaptureSettings": [
+                  {
+                      "Width": 1280,
+                      "Height": 960,
+                      "FOV_Degrees": 50,
+                      "ImageType": 0
+                  }
+              ],
+              "X": 0,
+              "Y": -0.85,
+              "Z": -0.75,
+              "Roll": 0,
+              "Pitch": 0,
+              "Yaw": 275
+          },
+          "RearwardLookingSideCamera_Right": {
+              "CaptureSettings": [
+                  {
+                      "Width": 1280,
+                      "Height": 960,
+                      "FOV_Degrees": 90,
+                      "ImageType": 0
+                  }
+              ],
+              "X": 0.75,
+              "Y": 0.85,
+              "Z": -0.75,
+              "Roll": 0,
+              "Pitch": 0,
+              "Yaw": 140
+          },
+          "RearwardLookingSideCamera_Left": {
+              "CaptureSettings": [
+                  {
+                      "Width": 1280,
+                      "Height": 960,
+                      "FOV_Degrees": 90,
+                      "ImageType": 0
+                  }
+              ],
+              "X": 0.75,
+              "Y": -0.85,
+              "Z": -0.75,
+              "Roll": 0,
+              "Pitch": 0,
+              "Yaw": 220
+          },
+          "RearViewCamera": {
+              "CaptureSettings": [
+                  {
+                      "Width": 1160,
+                      "Height": 720,
+                      "FOV_Degrees": 140,
+                      "ImageType": 0
+                  }
+              ],
+              "X": -2,
+              "Y": 0,
+              "Z": -0.75,
+              "Roll": 0,
+              "Pitch": 0,
+              "Yaw": 180
+          }
+        },
+        "Sensors": {
+            "IMU" : {
+                "SensorType" : 2,
+                "Enabled" : true
+            },
+            "Lidar_Roof": {
+                "SensorType": 6,
+                "Enabled": true,
+                "NumberOfChannels": 16,
+                "RotationsPerSecond": 10,
+                "PointsPerSecond": 100000,
+                "X": 0,
+                "Y": 0,
+                "Z": -0.05,
+                "Roll": 0,
+                "Pitch": 0,
+                "Yaw": 0,
+                "VerticalFOVUpper": 15,
+                "VerticalFOVLower": -15,
+                "HorizontalFOVStart": 0,
+                "HorizontalFOVEnd": 360,
+                "Range": 160,
+                "DrawDebugPoints": false,
+                "DataFrame": "SensorLocalFrame"
+            },
+            "Radar_Front": {
+                "SensorType": 6,
+                "Enabled": true,
+                "NumberOfChannels": 16,
+                "RotationsPerSecond": 10,
+                "PointsPerSecond": 100000,
+                "X": 0,
+                "Y": 0,
+                "Z": -0.05,
+                "Roll": 0,
+                "Pitch": 0,
+                "Yaw": 0,
+                "VerticalFOVUpper": 15,
+                "VerticalFOVLower": -15,
+                "HorizontalFOVStart": -17.5,
+                "HorizontalFOVEnd": 17.5,
+                "Range": 160,
+                "DrawDebugPoints": false,
+                "DataFrame": "SensorLocalFrame"
+            },
+            "Ultrasonic_left": {
+                "SensorType": 6,
+                "Enabled": true,
+                "NumberOfChannels": 16,
+                "RotationsPerSecond": 10,
+                "PointsPerSecond": 100000,
+                "X": 0,
+                "Y": 0,
+                "Z": -0.05,
+                "Roll": 0,
+                "Pitch": 0,
+                "Yaw": 270,
+                "VerticalFOVUpper": 15,
+                "VerticalFOVLower": -15,
+                "HorizontalFOVStart": -90,
+                "HorizontalFOVEnd": 90,
+                "Range": 8,
+                "DrawDebugPoints": false,
+                "DataFrame": "SensorLocalFrame"
+            },
+            "Ultrasonic_right": {
+                "SensorType": 6,
+                "Enabled": true,
+                "NumberOfChannels": 16,
+                "RotationsPerSecond": 10,
+                "PointsPerSecond": 100000,
+                "X": 0,
+                "Y": 0,
+                "Z": -0.05,
+                "Roll": 0,
+                "Pitch": 0,
+                "Yaw": 90,
+                "VerticalFOVUpper": 15,
+                "VerticalFOVLower": -15,
+                "HorizontalFOVStart": -90,
+                "HorizontalFOVEnd": 90,
+                "Range": 8,
+                "DrawDebugPoints": false,
+                "DataFrame": "SensorLocalFrame"
+            },
+            "Ultrasonic_front": {
+                "SensorType": 6,
+                "Enabled": true,
+                "NumberOfChannels": 16,
+                "RotationsPerSecond": 10,
+                "PointsPerSecond": 100000,
+                "X": 0,
+                "Y": 0,
+                "Z": -0.05,
+                "Roll": 0,
+                "Pitch": 0,
+                "Yaw": 0,
+                "VerticalFOVUpper": 15,
+                "VerticalFOVLower": -15,
+                "HorizontalFOVStart": -90,
+                "HorizontalFOVEnd": 90,
+                "Range": 8,
+                "DrawDebugPoints": false,
+                "DataFrame": "SensorLocalFrame"
+            },
+            "Ultrasonic_back": {
+                "SensorType": 6,
+                "Enabled": true,
+                "NumberOfChannels": 16,
+                "RotationsPerSecond": 10,
+                "PointsPerSecond": 100000,
+                "X": 0,
+                "Y": 0,
+                "Z": -0.05,
+                "Roll": 0,
+                "Pitch": 0,
+                "Yaw": 180,
+                "VerticalFOVUpper": 15,
+                "VerticalFOVLower": -15,
+                "HorizontalFOVStart": -90,
+                "HorizontalFOVEnd": 90,
+                "Range": 8,
+                "DrawDebugPoints": false,
+                "DataFrame": "SensorLocalFrame"
+            }
+        }
       }
     }
   }
-}

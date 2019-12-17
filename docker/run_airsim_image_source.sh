@@ -38,6 +38,7 @@ done
 # and tell the docker container to execute UNREAL_BINARY_COMMAND
 nvidia-docker run -it \
     -v $(pwd)/settings.json:/home/airsim_user/Documents/AirSim/settings.json \
+    -v /home/heron/Documents/AirSim/:/home/ue4/AirSim/ \
     -e SDL_VIDEODRIVER=$SDL_VIDEODRIVER_VALUE \
     -e SDL_HINT_CUDA_DEVICE='0' \
     --net=host \
@@ -47,5 +48,4 @@ nvidia-docker run -it \
     -env="XAUTHORITY=$XAUTH" \
     --volume="$XAUTH:$XAUTH" \
     --runtime=nvidia \
-    --rm \
     $DOCKER_IMAGE_NAME

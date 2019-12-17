@@ -469,7 +469,8 @@ public:
     struct LidarData {
 
         msr::airlib::TTimePoint time_stamp;    // timestamp
-        std::vector<float> point_cloud;        // data
+        // std::vector<float> point_cloud;        // data
+        std::vector<std::vector<float> > point_cloud;
         Pose pose;
 
         MSGPACK_DEFINE_MAP(time_stamp, point_cloud, pose);
@@ -483,8 +484,11 @@ public:
             point_cloud = s.point_cloud;
 
             //TODO: remove bug workaround for https://github.com/rpclib/rpclib/issues/152
-            if (point_cloud.size() == 0)
-                point_cloud.push_back(0);
+            if (point_cloud.size() == 0) {
+                // point_cloud.push_back(0);
+                std::vector<float> vec = {0};
+                point_cloud.push_back(vec);
+            }
 
             pose = s.pose;
         }

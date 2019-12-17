@@ -42,11 +42,10 @@ void UnrealLidarSensor::createLasers()
 
 // returns a point-cloud for the tick
 void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
-    const msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::real_T>& point_cloud, msr::airlib::vector<int>& segmentation_cloud)
+    const msr::airlib::TTimeDelta delta_time, msr::airlib::vector<msr::airlib::vector<msr::airlib::real_T> >& point_cloud, msr::airlib::vector<int>& segmentation_cloud)
 {
     point_cloud.clear();
     segmentation_cloud.clear();
-    std::cout << "in getPointCloud" << std::endl;
 
     msr::airlib::LidarSimpleParams params = getParams();
     const auto number_of_lasers = params.number_of_channels;
@@ -54,7 +53,8 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
     // cap the points to scan via ray-tracing; this is currently needed for car/Unreal tick scenarios
     // since SensorBase mechanism uses the elapsed clock time instead of the tick delta-time.
     constexpr float MAX_POINTS_IN_SCAN = 1e+5f;
-    uint32 total_points_to_scan = FMath::RoundHalfFromZero(params.points_per_second * delta_time);
+    // uint32 total_points_to_scan = FMath::RoundHalfFromZero(params.points_per_second * delta_time);
+    uint32 total_points_to_scan = params.points_per_second;
     if (total_points_to_scan > MAX_POINTS_IN_SCAN)
     {
         total_points_to_scan = MAX_POINTS_IN_SCAN;
@@ -70,18 +70,22 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
     }
 
     // calculate needed angle/distance between each point
-    const float angle_distance_of_tick = params.horizontal_rotation_frequency * 360.0f * delta_time;
-    const float angle_distance_of_laser_measure = angle_distance_of_tick / points_to_scan_with_one_laser;
+    // const float angle_distance_of_tick = params.horizontal_rotation_frequency * 360.0f * delta_time;
+    const float angle_distance_of_tick = params.horizontal_rotation_frequency;
+    // const float angle_distance_of_laser_measure = angle_distance_of_tick / points_to_scan_with_one_laser;
+    const float angle_distance_of_laser_measure = angle_distance_of_tick;
 
     // normalize FOV start/end
     const float laser_start = std::fmod(360.0f + params.horizontal_FOV_start, 360.0f);
     const float laser_end = std::fmod(360.0f + params.horizontal_FOV_end, 360.0f);
 
     // shoot lasers
+    // std::cout << " *=*=*=*=*=*=*=*=*=*= Starting lidar loop *=*=*=*=*=*=*=*=*=*=" << std::endl;
+    msr::airlib::vector<msr::airlib::real_T> vertical_angle_vec;
     for (auto laser = 0u; laser < number_of_lasers; ++laser)
     {
         const float vertical_angle = laser_angles_[laser];
-
+        vertical_angle_vec.clear();
         for (auto i = 0u; i < points_to_scan_with_one_laser; ++i)
         {
             const float horizontal_angle = std::fmod(current_horizontal_angle_ + angle_distance_of_laser_measure * i, 360.0f);
@@ -92,26 +96,38 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
        
             Vector3r point;
             int segmentationID = -1;
+            float distance;
             // shoot laser and get the impact point, if any
-            if (shootLaser(lidar_pose, vehicle_pose, laser, horizontal_angle, vertical_angle, params, point, segmentationID))
+            bool laser_hit = shootLaser(lidar_pose, vehicle_pose, laser, horizontal_angle, vertical_angle, params, point, segmentationID, distance);
+            // vertical_angle_vec.emplace_back(vertical_angle);
+            // vertical_angle_vec.emplace_back(horizontal_angle);
+            vertical_angle_vec.emplace_back(distance);
+            segmentation_cloud.emplace_back(segmentationID);
+            if (laser_hit)
             {
-                point_cloud.emplace_back(point.x());
-                point_cloud.emplace_back(point.y());
-                point_cloud.emplace_back(point.z());
-                segmentation_cloud.emplace_back(segmentationID);
+                // point_cloud.emplace_back(point.x());
+                // point_cloud.emplace_back(point.y());
+                // point_cloud.emplace_back(point.z());
+                // std::cout << "LASER HIT: Vertical: " << vertical_angle << " / Horizontal: " << horizontal_angle << " / Distance: " << distance << std::endl;
+                // point_cloud.emplace_back(vertical_angle);
+                // point_cloud.emplace_back(horizontal_angle);
+                // point_cloud.emplace_back(distance);
+                // segmentation_cloud.emplace_back(segmentationID);
             }
             else
             {
-                std::cout << "Emplacing -1" << std::endl;
-                point_cloud.emplace_back(-1);
-                point_cloud.emplace_back(-1);
-                point_cloud.emplace_back(-1);
-                segmentation_cloud.emplace_back(segmentationID);
+                // std::cout << "LASER MISS: Vertical: " << vertical_angle << " / Horizontal: " << horizontal_angle << " / Distance: " << distance << std::endl;
+                // point_cloud.emplace_back(-1);
+                // point_cloud.emplace_back(-1);
+                // point_cloud.emplace_back(-1);
+                // segmentation_cloud.emplace_back(segmentationID);
             }
         }
+        point_cloud.emplace_back(vertical_angle_vec);
     }
 
-    current_horizontal_angle_ = std::fmod(current_horizontal_angle_ + angle_distance_of_tick, 360.0f);
+    // current_horizontal_angle_ = std::fmod(current_horizontal_angle_ + angle_distance_of_tick, 360.0f);
+    current_horizontal_angle_ = 0.0f;
 
     return;
 }
@@ -119,7 +135,7 @@ void UnrealLidarSensor::getPointCloud(const msr::airlib::Pose& lidar_pose, const
 // simulate shooting a laser via Unreal ray-tracing.
 bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const msr::airlib::Pose& vehicle_pose,
     const uint32 laser, const float horizontal_angle, const float vertical_angle, 
-    const msr::airlib::LidarSimpleParams params, Vector3r &point, int &segmentationID)
+    const msr::airlib::LidarSimpleParams params, Vector3r &point, int &segmentationID, float &distance)
 {
     // start position
     Vector3r start = VectorMath::add(lidar_pose, vehicle_pose).position;
@@ -144,67 +160,70 @@ bool UnrealLidarSensor::shootLaser(const msr::airlib::Pose& lidar_pose, const ms
    
     FHitResult hit_result = FHitResult(ForceInit);
     bool is_hit = UAirBlueprintLib::GetObstacle(actor_, ned_transform_->fromLocalNed(start), ned_transform_->fromLocalNed(end), hit_result, actor_, ECC_Visibility);
+    distance = hit_result.Distance;
 
-    if (is_hit)
-    {
-        //Store the segmentation id of the hit object.
-        auto hitActor = hit_result.GetActor();
-        if (hitActor != nullptr)
-        {
-            TArray<UMeshComponent*> meshComponents;
-            hitActor->GetComponents<UMeshComponent>(meshComponents);
-            for (int i = 0; i < meshComponents.Num(); i++)
-            {
-                segmentationID = segmentationID == -1 ? meshComponents[i]->CustomDepthStencilValue : segmentationID;
-            }
-        }
+    return is_hit;
 
-        if (false && UAirBlueprintLib::IsInGameThread())
-        {
-            // Debug code for very specific cases.
-            // Mostly shouldn't be needed. Use SimModeBase::drawLidarDebugPoints()
-            DrawDebugPoint(
-                actor_->GetWorld(),
-                hit_result.ImpactPoint,
-                5,                       //size
-                FColor::Red,
-                true,                    //persistent (never goes away)
-                0.1                      //point leaves a trail on moving object
-            );
-        }
+    // if (is_hit)
+    // {
+    //     //Store the segmentation id of the hit object.
+    //     auto hitActor = hit_result.GetActor();
+    //     if (hitActor != nullptr)
+    //     {
+    //         TArray<UMeshComponent*> meshComponents;
+    //         hitActor->GetComponents<UMeshComponent>(meshComponents);
+    //         for (int i = 0; i < meshComponents.Num(); i++)
+    //         {
+    //             segmentationID = segmentationID == -1 ? meshComponents[i]->CustomDepthStencilValue : segmentationID;
+    //         }
+    //     }
 
-        // decide the frame for the point-cloud
-        if (params.data_frame == AirSimSettings::kVehicleInertialFrame) {
-            // current detault behavior; though it is probably not very useful.
-            // not changing the default for now to maintain backwards-compat.
-            point = ned_transform_->toLocalNed(hit_result.ImpactPoint);
-        }
-        else if (params.data_frame == AirSimSettings::kSensorLocalFrame) {
-            // point in vehicle intertial frame
-            Vector3r point_v_i = ned_transform_->toLocalNed(hit_result.ImpactPoint);
+    //     if (false && UAirBlueprintLib::IsInGameThread())
+    //     {
+    //         // Debug code for very specific cases.
+    //         // Mostly shouldn't be needed. Use SimModeBase::drawLidarDebugPoints()
+    //         DrawDebugPoint(
+    //             actor_->GetWorld(),
+    //             hit_result.ImpactPoint,
+    //             5,                       //size
+    //             FColor::Red,
+    //             true,                    //persistent (never goes away)
+    //             0.1                      //point leaves a trail on moving object
+    //         );
+    //     }
 
-            // tranform to lidar frame
-            point = VectorMath::transformToBodyFrame(point_v_i, lidar_pose + vehicle_pose, true);
+    //     // decide the frame for the point-cloud
+    //     if (params.data_frame == AirSimSettings::kVehicleInertialFrame) {
+    //         // current detault behavior; though it is probably not very useful.
+    //         // not changing the default for now to maintain backwards-compat.
+    //         point = ned_transform_->toLocalNed(hit_result.ImpactPoint);
+    //     }
+    //     else if (params.data_frame == AirSimSettings::kSensorLocalFrame) {
+    //         // point in vehicle intertial frame
+    //         Vector3r point_v_i = ned_transform_->toLocalNed(hit_result.ImpactPoint);
 
-            // The above should be same as first transforming to vehicle-body frame and then to lidar frame
-            //    Vector3r point_v_b = VectorMath::transformToBodyFrame(point_v_i, vehicle_pose, true);
-            //    point = VectorMath::transformToBodyFrame(point_v_b, lidar_pose, true);
+    //         // tranform to lidar frame
+    //         point = VectorMath::transformToBodyFrame(point_v_i, lidar_pose + vehicle_pose, true);
 
-            // On the client side, if it is needed to transform this data back to the world frame,
-            // then do the equivalent of following,
-            //     Vector3r point_w = VectorMath::transformToWorldFrame(point, lidar_pose + vehicle_pose, true);
-            // See SimModeBase::drawLidarDebugPoints()
+    //         // The above should be same as first transforming to vehicle-body frame and then to lidar frame
+    //         //    Vector3r point_v_b = VectorMath::transformToBodyFrame(point_v_i, vehicle_pose, true);
+    //         //    point = VectorMath::transformToBodyFrame(point_v_b, lidar_pose, true);
 
-            // TODO: Optimization -- instead of doing this for every point, it should be possible to do this
-            // for the point-cloud together? Need to look into matrix operations to do this together for all points.
-        }
-        else 
-            throw std::runtime_error("Unknown requested data frame");
+    //         // On the client side, if it is needed to transform this data back to the world frame,
+    //         // then do the equivalent of following,
+    //         //     Vector3r point_w = VectorMath::transformToWorldFrame(point, lidar_pose + vehicle_pose, true);
+    //         // See SimModeBase::drawLidarDebugPoints()
 
-        return true;
-    }
-    else 
-    {
-        return false;
-    }
+    //         // TODO: Optimization -- instead of doing this for every point, it should be possible to do this
+    //         // for the point-cloud together? Need to look into matrix operations to do this together for all points.
+    //     }
+    //     else 
+    //         throw std::runtime_error("Unknown requested data frame");
+
+    //     return true;
+    // }
+    // else 
+    // {
+    //     return false;
+    // }
 }

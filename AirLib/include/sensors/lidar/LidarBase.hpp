@@ -27,7 +27,8 @@ public: //types
         //       TODO: Do we need an intensity place-holder [x,y,z, intensity]?
         // - in lidar local NED coordinates
         // - in meters
-        vector<real_T> point_cloud;
+        // vector<real_T> point_cloud;
+        vector<vector<real_T> > point_cloud;
     };
 
 public:
@@ -37,12 +38,15 @@ public:
         UpdatableObject::reportState(reporter);
 
         reporter.writeValue("Lidar-Timestamp", output_.time_stamp);
-        reporter.writeValue("Lidar-NumPoints", static_cast<int>(output_.point_cloud.size() / 3));
+        // reporter.writeValue("Lidar-NumPoints", static_cast<int>(output_.point_cloud.size() / 3));
+        int x_size = output_.point_cloud.size(); /* size of y */
+        int y_size = output_.point_cloud[0].size(); /* size of x */
+        reporter.writeValue("Lidar-NumPoints", static_cast<int>(x_size*y_size));
     }
 
     const LidarData& getOutput() const
     {
-        std::cout << "in getOutput of LidarBase.hpp" << std::endl;
+        // std::cout << "in getOutput of LidarBase.hpp" << std::endl;
         return output_;
     }
 
